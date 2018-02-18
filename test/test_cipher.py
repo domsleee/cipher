@@ -109,7 +109,7 @@ class TestCipher(object):
         with open(os.path.join('folder1', 'file1.enc'), 'rb') as file:
             assert(file.read() == b'1234')
 
-    def test_modification_time_preserved(self):
+    def test_modification_time_preserved(self, mocker):
         file_structure = {
             'folder1': {
                 'file1': b'1234'
@@ -117,12 +117,33 @@ class TestCipher(object):
         }
         add_files(file_structure)
         file_path = os.path.join('folder1', 'file1')
-        modified_time = 50.5123
-        os.utime(file_path, times=(50, modified_time))
-        assert(os.path.getmtime(file_path) == modified_time)
+        cipher = lib_cipher.Cipher(AES_FOLDER, rsa_pub=RSA_PUB_FILE)
+        mocker.spy(lib_cipher, '_copy_modified_time')
+        cipher.encrypt_file('folder1')
+        assert(lib_cipher._copy_modified_time.call_count == 1)
 
+    def test__copy_modified_time(self):
+        add_files({'file1': None, 'file2': None})
+        os.utime('file1', times=(0, 20))
+        os.utime('file2', times=(0, 40))
+        lib_cipher._copy_modified_time('file1', 'file2')
+        assert(os.path.getmtime('file2') == 20)
+
+
+    def test_hidden_file(self):
+        file_structure = {
+            'folder1': {
+                'file1-h': b'1234'
+            }
+        }
+        add_files(file_structure)
+        file_path = os.path.join('folder1', 'file1')
         cipher = lib_cipher.Cipher(AES_FOLDER, rsa_pub=RSA_PUB_FILE)
         cipher.encrypt_file('folder1')
-        assert(os.path.getmtime(file_path+'.enc') == modified_time)
+        assert(os.listdir('folder1') == '.hidden')
+        file_path = os.path.join(file_path, '.hidden')
+        assert(os.path.isfile('.hidden'))
+
+
 
 

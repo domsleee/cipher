@@ -78,15 +78,6 @@ class Cipher:
             return lib_aes.Aes(secret)
 
 
-    def __get_rsa_obj(self, d):
-        return lib_rsa.rsa(public_key=d['rsapub'],
-                           private_key=d['rsa_priv'],
-                           passphrase=d['rsa_pass'])
-
-
-    def __get_header(aes_filename):
-        return b'1234'
-
     def encrypt_file(self, path):
         """Encrypts a file.
 
@@ -111,13 +102,8 @@ class Cipher:
                 with open(path, 'rb') as fin:
                     #fout.write(header.to_string())
                     fout.write(self.aes.encrypt(fin.read()))
-            self.__copy_modified_time(path, path_enc)
+            _copy_modified_time(path, path_enc)
             os.remove(path)
-
-
-    def __copy_modified_time(self, file, file_enc):
-        modified_time = os.path.getmtime(file)
-        os.utime(file_enc, times=(0, modified_time))
 
     def decrypt_file(self, filename):
         """Decrypts a file.
@@ -131,6 +117,9 @@ class Cipher:
         """
         pass
 
+def _copy_modified_time(file, file_enc):
+    modified_time = os.path.getmtime(file)
+    os.utime(file_enc, times=(0, modified_time))
 
 class _Header:
     def __init__(self, data=None):

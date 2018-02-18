@@ -7,8 +7,8 @@ Attributes:
 
 """
 
-from Crypto.Cipher import AES
-from Crypto.Util import Counter
+from Cryptodome.Cipher import AES
+from Cryptodome.Util import Counter
 import logging
 import os
 _logger = logging.getLogger('rsa')

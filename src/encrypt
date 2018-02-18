@@ -1,0 +1,30 @@
+#!/usr/bin/env python3
+import argparse
+import logging
+import lib.cipher as lib_cipher
+
+DESC = '''
+Encrypt file/folder
+'''
+EX = '''
+EX: %(prog)s file -k ~/.enc/rsa.pub
+'''
+
+
+def main(args):
+    logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO)
+    cipher = lib_cipher.Cipher(args.aes_dir, rsa_pub=args.key)
+    for file in args.file:
+        cipher.encrypt_file(file)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=DESC, epilog=EX)
+    parser.add_argument('file', nargs='+',
+                        help='file to be encrypted')
+    parser.add_argument('-k', '--key', default='~/.enc/rsa.pub'
+                        help='public key to use. Defaults to ~/.enc/rsa.key')
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='enable verbose mode')
+    args = parser.parse_args()
+    main(args)

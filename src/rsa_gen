@@ -1,0 +1,46 @@
+#!/usr/bin/env python3
+import argparse
+import logging
+import rsa
+
+DESC = '''
+Generate RSA keypair
+'''
+EX = '''
+EX: %(prog)s rsa.key rsa.pub -p password
+'''
+
+
+def main(args):
+    logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO)
+    passphrase = args.passphrase
+    if not passphrase:
+        passphrase = input('Enter a passphrase: ')
+
+    private, public = None
+    if args.modulo:
+        private, public = rsa.generate_keypair(passphrase=passphrase,
+                                               modulo=args.modulo)
+    else:
+        private, public = rsa.generate_keypair(passphrase=passphrase)
+
+    with open(args.private_key, 'wb') as f:
+        f.write(private)
+    with open(args.public_key, 'wb') as f:
+        f.write(public)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=DESC, epilog=EX)
+    parser.add_argument('private_key',
+                        help='file to save private key')
+    parser.add_argument('public_key',
+                        help='file to save public key')
+    parser.add_argument('-p', '--passphrase',
+                        help='passphrase used with private key')
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='enable verbose mode')
+    parser.add_argument('-m', '--modulo', type=int,
+                        help='specify RSA modulus length')
+    args = parser.parse_args()
+    main(args)

@@ -4,3 +4,4 @@ pycryptodomex==3.4.12
 pyfakefs==3.3
 coveralls
 coverage
+pytest-mock

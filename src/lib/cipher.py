@@ -102,7 +102,6 @@ class Cipher:
             path_enc = path+'.enc'
             if os.path.isfile(path_enc):
                 logger.info('%s already exists, refusing' % path_enc)
-                print('um')
                 return
             
             with open(path_enc, 'wb') as fout:

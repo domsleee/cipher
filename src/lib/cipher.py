@@ -17,6 +17,7 @@ import logging
 import os
 import random
 import string
+import re
 logger = logging.getLogger('cipher')
 
 class Cipher:
@@ -90,13 +91,19 @@ class Cipher:
             header (bytestring): Header bytestring to prepend before each file
 
         """
-        if os.path.isdir(path):
+        re_hidden_file = re.compile(r'-h($|\.)')
+
+        if re_hidden_file.match(path):
+            hidden_files.append(path)
+        elif os.path.isdir(path):
             for child in os.listdir(path):
                 self.encrypt_file(os.path.join(path, child))
         elif not path.endswith('.enc'):
             path_enc = path+'.enc'
-            if os.path.isfile(path):
+            if os.path.isfile(path_enc):
                 logger.info('%s already exists, refusing' % path_enc)
+                print('um')
+                return
             
             with open(path_enc, 'wb') as fout:
                 with open(path, 'rb') as fin:

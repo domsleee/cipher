@@ -109,6 +109,22 @@ class TestCipher(object):
         with open(os.path.join('folder1', 'file1.enc'), 'rb') as file:
             assert(file.read() == b'1234')
 
+    @mock.patch('src.lib.cipher.logger.info')
+    def test_dont_override(self, logging_info):
+        logging_info.return_value = None
+        file_structure = {
+            'folder1': {
+                'file1': b'1234',
+                'file1.enc': b'1234'
+            }
+        }
+        add_files(file_structure)
+
+        cipher = lib_cipher.Cipher(AES_FOLDER, rsa_pub=RSA_PUB_FILE)
+        cipher.encrypt_file('folder1')
+        assert(len(os.listdir('folder1')) == 2)
+        assert('refusing' in logging_info.call_args[0][0])
+
     def test_modification_time_preserved(self, mocker):
         file_structure = {
             'folder1': {
@@ -131,7 +147,6 @@ class TestCipher(object):
 
 
     def test_hidden_file(self):
-        return
         file_structure = {
             'folder1': {
                 'file1-h': b'1234'

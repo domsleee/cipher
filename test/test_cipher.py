@@ -1,5 +1,6 @@
 import os
 import src.lib.cipher as lib_cipher
+from src.lib.cipher import HIDDEN_FILE
 import test.mock_aes as mock_aes
 import test.mock_rsa as mock_rsa
 import mock
@@ -156,9 +157,9 @@ class TestCipher(object):
         file_path = os.path.join('folder1', 'file1')
         cipher = lib_cipher.Cipher(AES_FOLDER, rsa_pub=RSA_PUB_FILE)
         cipher.encrypt_file('folder1')
-        assert(os.listdir('folder1') == '.hidden')
-        file_path = os.path.join(file_path, '.hidden')
-        assert(os.path.isfile('.hidden'))
+        assert(os.listdir('folder1') == [HIDDEN_FILE])
+        file_path = os.path.join('folder1', HIDDEN_FILE)
+        assert(os.path.isfile(file_path))
 
 
 

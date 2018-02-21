@@ -18,7 +18,11 @@ import os
 import random
 import string
 import re
+import ntpath
+from collections import deque
+import shutil
 logger = logging.getLogger('cipher')
+HIDDEN_FILE = '.hidden'
 
 class Cipher:
     def __init__(self, aes_dir, **kwargs):
@@ -91,25 +95,56 @@ class Cipher:
             header (bytestring): Header bytestring to prepend before each file
 
         """
-        re_hidden_file = re.compile(r'-h($|\.)')
 
-        if re_hidden_file.match(path):
-            hidden_files.append(path)
-        elif os.path.isdir(path):
-            for child in os.listdir(path):
-                self.encrypt_file(os.path.join(path, child))
-        elif not path.endswith('.enc'):
-            path_enc = path+'.enc'
+        def handle_reg_file(filepath):
+            path_enc = filepath+'.enc'
             if os.path.isfile(path_enc):
                 logger.info('%s already exists, refusing' % path_enc)
                 return
             
             with open(path_enc, 'wb') as fout:
-                with open(path, 'rb') as fin:
-                    #fout.write(header.to_string())
+                with open(filepath, 'rb') as fin:
+                    # TODO
+                    #out_data = self.header_layer.encode(fin.read())
+                    #fout.write(out_data)
                     fout.write(self.aes.encrypt(fin.read()))
-            _copy_modified_time(path, path_enc)
-            os.remove(path)
+            _copy_modified_time(filepath, path_enc)
+            os.remove(filepath)
+
+
+        def handle_folder(path, files):
+            re_hidden_file = re.compile(r'-h($|\.)')
+            re_encrypted_file = re.compile(r'(\.enc$)|(^'+HIDDEN_FILE+r'\d*$)')
+            hidden_filenames = []
+            for filename in files:
+                if re_encrypted_file.search(filename):
+                    pass
+                elif re_hidden_file.search(filename):
+                    hidden_filenames.append(filename)
+                else:
+                    handle_reg_file(os.path.join(path, filename))
+            handle_hidden_filenames(path, hidden_filenames)
+
+
+        def handle_hidden_filenames(path, hidden_filenames):
+            if len(hidden_filenames):
+                hidden_dir = os.path.join(path, HIDDEN_FILE)
+                os.mkdir(hidden_dir)
+                for filename in hidden_filenames:
+                    filepath = os.path.join(path, filename)
+                    os.rename(filepath, os.path.join(hidden_dir, filename))
+                tmp_file = hidden_dir+'.tmp'
+                data = b'1'#self.hidden_layer.encode(hidden_dir)
+                with open(tmp_file, 'wb') as fout:
+                    fout.write(data)
+                shutil.rmtree(hidden_dir)
+                os.rename(tmp_file, hidden_dir)
+
+        if os.path.isfile(path):
+            handle_folder(os.path.dirname(path), [ntpath.basename(path)])
+        else:
+            handle_folder(path, os.listdir(path))
+
 
     def decrypt_file(self, filename):
         """Decrypts a file.
@@ -126,19 +161,3 @@ class Cipher:
 def _copy_modified_time(file, file_enc):
     modified_time = os.path.getmtime(file)
     os.utime(file_enc, times=(0, modified_time))
-
-class _Header:
-    def __init__(self, data=None):
-        self.data = data
-        self.length = None
-
-
-    def encode(self, data):
-        pass
-
-    def decode(self, next_byte):
-        pass
-
-    def to_string(self):
-        encoded = self.encode(data)
-        return self.length + self.data

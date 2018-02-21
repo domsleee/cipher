@@ -94,6 +94,27 @@ class TestCipher(object):
         with open(os.path.join('folder1', 'file1.enc'), 'rb') as file:
             assert(file.read() == b'4321')
 
+    def test_nested_file(self):
+        file_structure = {
+            'folder1': {
+                'folder2': {
+                    'file1': b'1234'
+                }
+            }
+        }
+        add_files(file_structure)
+
+        cipher = lib_cipher.Cipher(AES_FOLDER, rsa_pub=RSA_PUB_FILE)
+        cipher.encrypt_file('folder1')
+
+        expected_structure = {
+            'file1.enc': None
+        }
+        folder_path = os.path.join('folder1', 'folder2')
+        assert(os.listdir(folder_path) == ['file1.enc'])
+        with open(os.path.join(folder_path, 'file1.enc'), 'rb') as file:
+            assert(file.read() == b'4321')
+
 
     def test_already_encrypted(self):
         file_structure = {

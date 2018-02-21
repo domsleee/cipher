@@ -117,12 +117,15 @@ class Cipher:
             re_encrypted_file = re.compile(r'(\.enc$)|(^'+HIDDEN_FILE+r'\d*$)')
             hidden_filenames = []
             for filename in files:
+                new_path = os.path.join(path, filename)
                 if re_encrypted_file.search(filename):
                     pass
                 elif re_hidden_file.search(filename):
                     hidden_filenames.append(filename)
+                elif os.path.isdir(new_path):
+                    handle_folder(new_path, os.listdir(new_path))
                 else:
-                    handle_reg_file(os.path.join(path, filename))
+                    handle_reg_file(new_path)
             handle_hidden_filenames(path, hidden_filenames)
 
 

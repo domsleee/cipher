@@ -52,7 +52,6 @@ class TestConnection:
         assert(mock_conn.conn2.do_encode() == CONN_TWO_ENCODE)
         assert(mock_conn.conn2.do_decode() == CONN_TWO_DECODE)
 
-
     def test_encode_attach_three(self, mock_conn):
         mock_conn.conn1.attach(mock_conn.conn2)
         mock_conn.conn2.attach(mock_conn.conn3)
@@ -66,4 +65,7 @@ class TestConnection:
         assert(mock_conn.conn2.do_encode() == CONN_THR_ENCODE)
         assert(mock_conn.conn2.do_decode() == CONN_TWO_DECODE)
 
-
+    def test_interface_functions(self):
+        conn = Connection()
+        conn._encode()
+        conn._decode()

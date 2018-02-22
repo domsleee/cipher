@@ -127,21 +127,16 @@ class Cipher:
                 os.rename(tmp_file, hidden_dir)
 
 
-        all_files_override = None
+        walk_override = None
         if os.path.isfile(path):
-            all_files_override = [ntpath.basename(path)]
-            path = os.path.dirname(path)
+            walk_override = [(os.path.dirname(path), [], [ntpath.basename(path)])]
 
         re_hidden_file = re.compile(r'-h($|\.)')
         re_encrypted_file = re.compile(r'(\.enc$)|(^'+HIDDEN_FILE+r'\d*$)')
-        for root, dirs, files in os.walk(path):
-            all_files = dirs + files
-            if all_files_override:
-                all_files = all_files_override
-                all_files_override = None
-
+        use_walk = walk_override if walk_override else os.walk(path)
+        for root, dirs, files in use_walk:
             hidden_filenames = []
-            for file in all_files:
+            for file in dirs + files:
                 filepath = os.path.join(root, file)
                 if re_encrypted_file.search(file):
                     pass
@@ -152,7 +147,6 @@ class Cipher:
                 elif os.path.isfile(filepath):
                     handle_reg_file(filepath)
             handle_hidden_filenames(root, hidden_filenames)
-
 
 
     def decrypt_file(self, filename):

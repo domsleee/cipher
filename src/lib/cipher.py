@@ -142,7 +142,7 @@ class Cipher:
                     pass
                 elif re_hidden_file.search(file):
                     hidden_filenames.append(file)
-                    if os.path.isdir(file):
+                    if os.path.isdir(filepath):
                         dirs.remove(file)
                 elif os.path.isfile(filepath):
                     handle_reg_file(filepath)

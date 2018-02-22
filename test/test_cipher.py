@@ -194,7 +194,21 @@ class TestCipher(object):
             }
         }
         add_files(file_structure)
-        file_path = os.path.join('folder1', 'file1')
+        cipher = lib_cipher.Cipher(AES_FOLDER, rsa_pub=RSA_PUB_FILE)
+        cipher.encrypt_file('folder1')
+        assert(os.listdir('folder1') == [HIDDEN_FILE])
+        file_path = os.path.join('folder1', HIDDEN_FILE)
+        assert(os.path.isfile(file_path))
+
+    def test_hidden_folder(self):
+        file_structure = {
+            'folder1': {
+                'folder2-h': {
+                    'file1-h': b'1234'
+                }
+            }
+        }
+        add_files(file_structure)
         cipher = lib_cipher.Cipher(AES_FOLDER, rsa_pub=RSA_PUB_FILE)
         cipher.encrypt_file('folder1')
         assert(os.listdir('folder1') == [HIDDEN_FILE])

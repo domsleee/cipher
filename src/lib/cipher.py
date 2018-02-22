@@ -97,6 +97,7 @@ class Cipher:
         """
 
         def handle_reg_file(filepath):
+            print(filepath)
             path_enc = filepath+'.enc'
             if os.path.isfile(path_enc):
                 logger.info('%s already exists, refusing' % path_enc)
@@ -110,24 +111,6 @@ class Cipher:
                     fout.write(self.aes.encrypt(fin.read()))
             _copy_modified_time(filepath, path_enc)
             os.remove(filepath)
-
-
-        def handle_folder(path, files):
-            re_hidden_file = re.compile(r'-h($|\.)')
-            re_encrypted_file = re.compile(r'(\.enc$)|(^'+HIDDEN_FILE+r'\d*$)')
-            hidden_filenames = []
-            for filename in files:
-                new_path = os.path.join(path, filename)
-                if re_encrypted_file.search(filename):
-                    pass
-                elif re_hidden_file.search(filename):
-                    hidden_filenames.append(filename)
-                elif os.path.isdir(new_path):
-                    handle_folder(new_path, os.listdir(new_path))
-                else:
-                    handle_reg_file(new_path)
-            handle_hidden_filenames(path, hidden_filenames)
-
 
         def handle_hidden_filenames(path, hidden_filenames):
             if len(hidden_filenames):
@@ -143,10 +126,33 @@ class Cipher:
                 shutil.rmtree(hidden_dir)
                 os.rename(tmp_file, hidden_dir)
 
+
+        all_files_override = None
         if os.path.isfile(path):
-            handle_folder(os.path.dirname(path), [ntpath.basename(path)])
-        else:
-            handle_folder(path, os.listdir(path))
+            all_files_override = [ntpath.basename(path)]
+            path = os.path.dirname(path)
+
+        re_hidden_file = re.compile(r'-h($|\.)')
+        re_encrypted_file = re.compile(r'(\.enc$)|(^'+HIDDEN_FILE+r'\d*$)')
+        for root, dirs, files in os.walk(path):
+            all_files = dirs + files
+            if all_files_override:
+                all_files = all_files_override
+                all_files_override = None
+
+            hidden_filenames = []
+            for file in all_files:
+                filepath = os.path.join(root, file)
+                if re_encrypted_file.search(file):
+                    pass
+                elif re_hidden_file.search(file):
+                    hidden_filenames.append(file)
+                    if os.path.isdir(file):
+                        dirs.remove(file)
+                elif os.path.isfile(filepath):
+                    handle_reg_file(filepath)
+            handle_hidden_filenames(root, hidden_filenames)
+
 
 
     def decrypt_file(self, filename):

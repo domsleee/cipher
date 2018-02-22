@@ -85,6 +85,25 @@ class TestCipher(object):
         add_files(file_structure)
 
         cipher = lib_cipher.Cipher(AES_FOLDER, rsa_pub=RSA_PUB_FILE)
+        cipher.encrypt_file(os.path.join('folder1', 'file1'))
+
+        expected_structure = {
+            'file1.enc': None
+        }
+        assert(os.listdir('folder1') == ['file1.enc'])
+        with open(os.path.join('folder1', 'file1.enc'), 'rb') as file:
+            assert(file.read() == b'4321')
+
+
+    def test_basic_encrypt_folder(self):
+        file_structure = {
+            'folder1': {
+                'file1': b'1234'
+            }
+        }
+        add_files(file_structure)
+
+        cipher = lib_cipher.Cipher(AES_FOLDER, rsa_pub=RSA_PUB_FILE)
         cipher.encrypt_file('folder1')
 
         expected_structure = {

@@ -214,7 +214,3 @@ class TestCipher(object):
         assert(os.listdir('folder1') == [HIDDEN_FILE])
         file_path = os.path.join('folder1', HIDDEN_FILE)
         assert(os.path.isfile(file_path))
-
-
-
-

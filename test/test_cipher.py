@@ -166,7 +166,7 @@ class TestCipher(object):
         assert(len(os.listdir('folder1')) == 2)
         assert('refusing' in logging_info.call_args[0][0])
 
-    def test_modification_time_preserved(self, mocker):
+    def test_modification_time_preserved(self):
         file_structure = {
             'folder1': {
                 'file1': b'1234'
@@ -174,10 +174,13 @@ class TestCipher(object):
         }
         add_files(file_structure)
         file_path = os.path.join('folder1', 'file1')
-        cipher = lib_cipher.Cipher(AES_FOLDER, rsa_pub=RSA_PUB_FILE)
-        mocker.spy(lib_cipher, '_copy_modified_time')
-        cipher.encrypt_file('folder1')
-        assert(lib_cipher._copy_modified_time.call_count == 1)
+
+        with mock.patch('src.lib.cipher._copy_modified_time') as copy_modified_time:
+            copy_modified_time.return_value = None
+            cipher = lib_cipher.Cipher(AES_FOLDER, rsa_pub=RSA_PUB_FILE)
+            cipher.encrypt_file('folder1')
+            assert(copy_modified_time.call_count == 1)
+
 
     def test__copy_modified_time(self):
         add_files({'file1': None, 'file2': None})

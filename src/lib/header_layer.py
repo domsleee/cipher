@@ -1,19 +1,16 @@
 from src.lib.connection import Connection
-from hashlib import sha256
 import logging
 import re
 logger = logging.getLogger('header_layer')
 
 class HeaderLayer(Connection):
-    def __init__(self, aes_filename):
+    def __init__(self):
         Connection.__init__(self)
-        if not isinstance(aes_filename, (bytes, bytearray)):
-            raise ValueError('aes_filename must be a bytestring')
-        self.aes_filename = aes_filename
 
     def _encode(self, child_data=None):
-        header = b'{aes_filename:' + self.aes_filename + b'}'
-        return header + child_data
+        # in format {aes_filename:_, data:_}
+        header = b'{aes_filename:' + child_data['aes_filename'] + b'}'
+        return header + child_data['data']
 
     def _decode(self, parent_data=None):
         re_header = re.compile(r'{aes_filename:([^}]*)}(.*)')

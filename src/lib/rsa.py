@@ -55,6 +55,9 @@ class Rsa:
             raise ValueError('Public key required to encrypt')
         return self._public_key.encrypt(data)
 
+    def can_encrypt(self):
+        return self._public_key != None
+
     def decrypt(self, data):
         """Decrypts data using rsa private key.
 
@@ -71,6 +74,9 @@ class Rsa:
         if not self._private_key:
             raise ValueError('Private key required to decrypt')
         return self._private_key.decrypt(data)
+
+    def can_decrypt(self):
+        return self._private_key != None
 
 
 def generate_keypair(passphrase=None, modulo=8912):

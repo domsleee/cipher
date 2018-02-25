@@ -23,3 +23,8 @@ class TestHeaderLayer:
     def test_decode_wrong_format_type(self):
         with pytest.raises(ValueError):
             self.header_layer.do_decode(b'1'+self._get_encoded_str(b'1'))
+
+    def test_decode_too_small(self):
+        data = 'a'
+        with pytest.raises(ValueError):
+            self.header_layer.do_decode(data)

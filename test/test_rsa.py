@@ -45,6 +45,19 @@ class TestRsa(object):
         with pytest.raises(ValueError):
             rsa.decrypt(TXT_ENC)
 
+    def test_can_encrypt(self):
+        rsa = lib_rsa.Rsa(public_key=PUBLIC_KEY)
+        assert(rsa.can_encrypt())
+        rsa = lib_rsa.Rsa()
+        assert(not rsa.can_encrypt())
+
+    def test_can_decrypt(self):
+        rsa = lib_rsa.Rsa(private_key=PRIVATE_KEY, passphrase=PRIVATE_KEY_PASS)
+        assert(rsa.can_decrypt())
+        rsa = lib_rsa.Rsa()
+        assert(not rsa.can_decrypt())
+
+
 
 def test_generate_keypair_no_pass(fs):
     private, public = lib_rsa.generate_keypair(modulo=1024)

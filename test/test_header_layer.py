@@ -18,4 +18,4 @@ class TestHeaderLayer:
         data = b'abc'
         encoded = self._get_encoded_str(data)
         res = self.header_layer.do_decode(encoded)
-        assert(res == data)
+        assert(res == {'aes_filename': self.aes_filename, 'data': data})

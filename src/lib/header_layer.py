@@ -19,4 +19,4 @@ class HeaderLayer(Connection):
             raise ValueError('Incorrect format type')
         aes_filename = m.group(1).encode('UTF-8')
         data = m.group(2).encode('UTF-8')
-        return data
+        return {'aes_filename': aes_filename, 'data': data}

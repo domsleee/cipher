@@ -12,11 +12,10 @@ Todo:
 """
 
 import src.lib.aes as lib_aes
-import src.lib.rsa as lib_rsa
+from src.lib.aes_layer import AesLayer
+from src.lib.header_layer import HeaderLayer
 import logging
 import os
-import random
-import string
 import re
 import ntpath
 from collections import deque
@@ -25,77 +24,14 @@ logger = logging.getLogger('cipher')
 HIDDEN_FILE = '.hidden'
 
 class Cipher:
-    def __init__(self, aes_dir, **kwargs):
-        """High-level cipher class.
-
-        Args:
-            aes_dir (string): Directory of aes secrets.
-            **kwargs: Optional arguments, default to None:
-                rsa_pub (string): Public key path.
-                rsa_priv (string): Private key path.
-                rsa_pass (string): Private key password.
-                aes_filename (string): Filename of AES secret
-
-        Attributes:
-            header (string): Prepend to every encrypted file
-            aes (Aes): AES cipher object
-
-        """
-        __fields = ['rsa_pub', 'rsa_priv', 'rsa_pass', 'aes_filename']
-        d = {key: None for key in __fields}
-        for key in kwargs:
-            d[key] = kwargs[key]
-        self.aes, aes_filename = self.__get_aes_info(aes_dir, d)
-        return
-        self.header = self.__get_header(aes_filename)
-
-
-    def __get_aes_info(self, aes_dir, d):
-        aes, aes_filename = None, None
-        if d['aes_filename']:
-            aes_filename = d['aes_filename']
-            private_key = open(d['rsa_priv'], 'rb').read()
-            rsa = lib_rsa.Rsa(private_key=private_key, passphrase=d['rsa_pass'])
-            aes = self.__open_aes_secret(aes_dir, aes_filename, rsa)
-        else:
-            public_key = open(d['rsa_pub'], 'rb').read()
-            rsa = lib_rsa.Rsa(public_key=public_key)
-            aes_filename, aes = self.__get_aes_secret(aes_dir, rsa)
-        return aes, aes_filename
-
-
-    def __get_aes_secret(self, aes_dir, rsa):
-        secret = lib_aes.generate_secret()
-        secret_encrypted = rsa.encrypt(secret)
-        while True:
-            aes_filename = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
-            aes_path = os.path.join(aes_dir, aes_filename)
-            if not os.path.isdir(aes_path):
-                with open(aes_path, 'wb') as file:
-                    file.write(secret_encrypted)
-                return aes_filename, lib_aes.Aes(secret)
-
-
-    def __open_aes_secret(self, aes_dir, filename, rsa):
-        with open(os.path.join(aes_dir, filename), 'rb') as file:
-            secret_encrypted = file.read()
-            secret = rsa.decrypt(secret_encrypted)
-            return lib_aes.Aes(secret)
-
+    def __init__(self, aes_dir, rsa_pub=None, rsa_priv=None, passphrase=None):
+        self.aes_layer = AesLayer(aes_dir, rsa_pub=rsa_pub, rsa_priv=rsa_priv, passphrase=passphrase)
+        self.header_layer = HeaderLayer()
+        self.aes_layer.attach(self.header_layer)
+        #self.hidden_layer = HiddenLayer()
+        #self.hidden_layer.attach(self.aes_layer)
 
     def encrypt_file(self, path):
-        """Encrypts a file.
-
-        Requires:
-            `self.rsa_pub`.
-
-        Args:
-            filename (string): Name of file to encrypt.
-            aes (Aes): AES object used to encrypt files.
-            header (bytestring): Header bytestring to prepend before each file
-
-        """
-
         def handle_reg_file(filepath):
             path_enc = filepath+'.enc'
             if os.path.isfile(path_enc):
@@ -104,10 +40,9 @@ class Cipher:
             
             with open(path_enc, 'wb') as fout:
                 with open(filepath, 'rb') as fin:
-                    # TODO
-                    #out_data = self.header_layer.encode(fin.read())
-                    #fout.write(out_data)
-                    fout.write(self.aes.encrypt(fin.read()))
+                    print("AES_LAYER")
+                    out_data = self.aes_layer.do_encode(fin.read())
+                    fout.write(out_data)
             _copy_modified_time(filepath, path_enc)
             os.remove(filepath)
 
@@ -119,12 +54,10 @@ class Cipher:
                     filepath = os.path.join(path, filename)
                     os.rename(filepath, os.path.join(hidden_dir, filename))
                 tmp_file = hidden_dir+'.tmp'
-                data = b'1'#self.hidden_layer.encode(hidden_dir)
                 with open(tmp_file, 'wb') as fout:
-                    fout.write(data)
+                    fout.write(b'1')#self.hidden_layer.encode(hidden_dir)
                 shutil.rmtree(hidden_dir)
                 os.rename(tmp_file, hidden_dir)
-
 
         walk_override = None
         if os.path.isfile(path):

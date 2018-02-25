@@ -7,6 +7,7 @@ import os
 import logging
 import re
 logger = logging.getLogger('aes_layer')
+AES_FILENAME_LENGTH = 10
 
 class AesLayer(Connection):
     def __init__(self, aes_dir, rsa_pub=None, rsa_priv=None, passphrase=None):
@@ -38,7 +39,7 @@ class AesLayer(Connection):
         secret = lib_aes.generate_secret()
         secret_encrypted = self.rsa.encrypt(secret)
         while True:
-            aes_filename = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
+            aes_filename = ''.join(random.choices(string.ascii_lowercase + string.digits, k=AES_FILENAME_LENGTH))
             aes_path = os.path.join(self.aes_dir, aes_filename)
             if not os.path.isdir(aes_path):
                 with open(aes_path, 'wb') as file:

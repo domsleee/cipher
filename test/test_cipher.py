@@ -20,13 +20,10 @@ def add_files(structure, path='.'):
             with open(new_path, 'wb') as file:
                 file.write(data)
 
-
 @pytest.fixture()
 def cipher(request, mocker):
     lib_cipher.AesLayer = mock.MagicMock(return_value=MockConnection())
     lib_cipher.HeaderLayer = mock.MagicMock(return_value=MockConnection())
-
-    # mock all the methods of the instance.
     cipher = lib_cipher.Cipher(AES_FOLDER)
     conns = ['aes_layer', 'header_layer']
     methods = ['do_encode', 'do_decode', 'attach']
@@ -34,7 +31,6 @@ def cipher(request, mocker):
         for method in methods:
             mocker.spy(getattr(cipher, conn), method)
     return cipher
-
 
 
 @pytest.mark.usefixtures('fs')

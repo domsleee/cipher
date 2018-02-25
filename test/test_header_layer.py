@@ -19,3 +19,7 @@ class TestHeaderLayer:
         encoded = self._get_encoded_str(data)
         res = self.header_layer.do_decode(encoded)
         assert(res == {'aes_filename': self.aes_filename, 'data': data})
+
+    def test_decode_wrong_format_type(self):
+        with pytest.raises(ValueError):
+            self.header_layer.do_decode(b'1'+self._get_encoded_str(b'1'))

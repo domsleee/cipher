@@ -1,6 +1,6 @@
-"""Simple RSA interface.
+"""Simple AES interface.
 
-Allows for generating RSA keypairs and encrypting/decrypting.
+Allows for generating AES secrets and encrypting/decrypting.
 
 Attributes:
     _logger (Logger): Module-level logging.
@@ -32,7 +32,7 @@ class Aes:
         return AES.new(self._secret, AES.MODE_CTR, counter=ctr)
 
     def encrypt(self, data):
-        """Encrypts data using AES `self._aes`.
+        """Encrypts data using AES with secret
 
         Args:
             data (string): Data to be encrypted.
@@ -46,7 +46,7 @@ class Aes:
         return ciphertext
 
     def decrypt(self, data):
-        """Decrypts data using AES `self._aes`.
+        """Decrypts data using AES with secret
 
         Args:
             data (string): Data to be encrypted.

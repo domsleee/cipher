@@ -3,11 +3,8 @@
 Handles encryption/decryption with RSA/AES hybrid. Also
 manages hidden folders.
 
-Attributes:
-    _logger (Logger): Module-level logging.
-
 Todo:
-    * encrypt/decrypt implementations.
+    * decrypt implementation
 
 """
 
@@ -96,15 +93,3 @@ class Cipher:
 def _copy_modified_time(file, file_enc):
     modified_time = os.path.getmtime(file)
     os.utime(file_enc, times=(0, modified_time))
-
-#
-#class _HiddenLayer(Connection):
-#    def _encode(self, child_data=None):
-#        path = child_data['path']
-#        return b'1'
-#
-#    def _decode(self, parent_data=None):
-#        return ['file1', 'file2']
-
-
-

@@ -1,3 +1,10 @@
+"""Header layer of cipher.
+
+Encapsulates the data with information about which aes_filename
+was used. Has no responsibility for file system or filename
+generation
+
+"""
 from src.lib.connection import Connection
 from src.lib.aes_layer import AES_FILENAME_LENGTH
 import logging

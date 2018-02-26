@@ -1,3 +1,9 @@
+"""AES layer of cipher.
+
+Encrypts/decrypts using AES, and works with aes filenames
+and the RSA encrypted aes secrets in the filesystem
+
+"""
 from src.lib.connection import Connection
 import src.lib.rsa as lib_rsa
 import src.lib.aes as lib_aes

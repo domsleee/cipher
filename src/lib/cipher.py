@@ -29,6 +29,8 @@ class Cipher:
         #self.hidden_layer.attach(self.aes_layer)
 
     def encrypt_file(self, path):
+        """Encrypts a file/folder
+        """
         def handle_reg_file(filepath):
             path_enc = filepath+'.enc'
             if os.path.isfile(path_enc):
@@ -79,14 +81,7 @@ class Cipher:
 
 
     def decrypt_file(self, filename):
-        """Decrypts a file.
-
-        Requires:
-            `self.rsa_priv`.
-
-        Args:
-            filename (string): Name of file to encrypt.
-
+        """Decrypts a file/folder.
         """
         pass
 

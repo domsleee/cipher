@@ -2,9 +2,6 @@
 
 Allows for generating AES secrets and encrypting/decrypting.
 
-Attributes:
-    _logger (Logger): Module-level logging.
-
 """
 
 from Cryptodome.Cipher import AES
@@ -17,13 +14,6 @@ _logger = logging.getLogger('rsa')
 class Aes:
     def __init__(self, secret):
         """AES cipher class.
-
-        Args:
-            secret (string): Secret to be used with AES.
-
-        Attributes:
-            _secret (bytestring): Secret used with AES cipher.
-
         """
         self._secret = secret
 
@@ -33,13 +23,6 @@ class Aes:
 
     def encrypt(self, data):
         """Encrypts data using AES with secret
-
-        Args:
-            data (string): Data to be encrypted.
-
-        Returns:
-            String: The result of encrypting `data`.
-
         """
         aes = self._get_aes()
         ciphertext = aes.encrypt(data)
@@ -47,22 +30,11 @@ class Aes:
 
     def decrypt(self, data):
         """Decrypts data using AES with secret
-
-        Args:
-            data (string): Data to be encrypted.
-
-        Returns:
-            String: The result of encrypting `data`.
-
         """
         return self.encrypt(data)
 
 
 def generate_secret():
     """Generates a 256-bit AES secret.
-
-    Returns:
-        bytestring: The resultant key.
-
     """
     return os.urandom(32)

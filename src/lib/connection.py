@@ -48,9 +48,6 @@ class Connection:
 
     def attach(self, conn):
         """Attach a connection as a child to the instance
-
-        Args:
-            conn (Connection): Connection to attach as child.
         """
         if not isinstance(conn, Connection):
             raise ValueError(ENFORCE_ATTACH_MESSAGE)

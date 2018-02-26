@@ -12,7 +12,7 @@ CONN_THR_DECODE = 'f'
 
 @pytest.fixture()
 def mock_conn(request, mocker):
-    obj = SimpleNamespace(**{'conn1': Connection(), 'conn2':Connection(), 'conn3':Connection()})
+    obj = SimpleNamespace(**{'conn1': Connection(), 'conn2': Connection(), 'conn3': Connection()})
     obj.conn1._encode = lambda x: CONN_ONE_ENCODE
     obj.conn1._decode = lambda x: CONN_ONE_DECODE
     obj.conn2._encode = lambda x: CONN_TWO_ENCODE

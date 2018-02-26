@@ -41,8 +41,8 @@ class Cipher:
             with open(path_enc, 'wb') as fout:
                 with open(filepath, 'rb') as fin:
                     print("AES_LAYER")
-                    out_data = self.aes_layer.do_encode(fin.read())
-                    fout.write(out_data)
+                    out_data = self.aes_layer.do_encode(data=fin.read())
+                    fout.write(out_data['data'])
             _copy_modified_time(filepath, path_enc)
             os.remove(filepath)
 

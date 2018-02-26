@@ -9,21 +9,20 @@ class HeaderLayer(Connection):
     def __init__(self):
         Connection.__init__(self)
 
-    def _encode(self, child_data=None):
-        # in format {aes_filename:_, data:_}
-        header = b'{aes_filename:' + child_data['aes_filename'] + b'}'
-        return header + child_data['data']
+    def _encode(self, aes_filename, data):
+        header = b'{aes_filename:' + aes_filename + b'}'
+        return {'data': header + data}
 
-    def _decode(self, parent_data=None):
+    def _decode(self, data):
         m = None
-        if len(parent_data) < HEADER_LENGTH:
+        if len(data) < HEADER_LENGTH:
             raise ValueError('Data must be at least the side of the header')
 
-        header = parent_data[:HEADER_LENGTH]
+        header = data[:HEADER_LENGTH]
         re_header = re.compile(r'{aes_filename:([^}]*)}')
-        m = re_header.match(parent_data.decode('UTF-8'))
+        m = re_header.match(data.decode('UTF-8'))
         if not m:
             raise ValueError('Incorrect format type')
         aes_filename = m.group(1).encode('UTF-8')
-        data = parent_data[HEADER_LENGTH:]
+        data = data[HEADER_LENGTH:]
         return {'aes_filename': aes_filename, 'data': data}

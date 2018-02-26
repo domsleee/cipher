@@ -50,7 +50,7 @@ class TestCipher(object):
         }
         assert(os.listdir('folder1') == ['file1.enc'])
         assert(cipher.aes_layer.do_encode.call_count == 1)
-        assert(cipher.aes_layer.do_encode.call_args[0] == (data,))
+        assert(cipher.aes_layer.do_encode.call_args_list[0][1] == {'data': data})
 
     def test_basic_encrypt_folder(self, cipher):
         data = b'1234'
@@ -69,8 +69,8 @@ class TestCipher(object):
         }
         assert(os.listdir('folder1') == ['file1.enc', 'file2.enc'])
         assert(cipher.aes_layer.do_encode.call_count == 2)
-        assert(cipher.aes_layer.do_encode.call_args_list[0][0] == (data,))
-        assert(cipher.aes_layer.do_encode.call_args_list[1][0] == (data2,))
+        assert(cipher.aes_layer.do_encode.call_args_list[0][1] == {'data': data})
+        assert(cipher.aes_layer.do_encode.call_args_list[1][1] == {'data': data2})
 
     def test_nested_file(self, cipher):
         file_structure = {

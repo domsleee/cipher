@@ -83,15 +83,15 @@ class TestAesLayer:
 
     def test_encode(self):
         data = b'1234'
-        res = self.aes_layer.do_encode(data)
+        res = self.aes_layer.do_encode(data=data)
         assert(len(res) == 2)
         assert(res['data'] == self.mock_aes.encrypt(data))
         assert(res['aes_filename'] == AES_FILENAME)
 
     def test_decode(self):
         data = b'12345'
-        res = self.aes_layer.do_decode({'data': data, 'aes_filename': AES_FILENAME})
-        assert(res == self.mock_aes.decrypt(data))
+        res = self.aes_layer.do_decode(data=data, aes_filename=AES_FILENAME)
+        assert(res['data'] == self.mock_aes.decrypt(data))
 
     def test_rsa_priv_is_read(self, mocker):
         mocker.spy(src.lib.aes_layer.lib_rsa.Rsa, '__init__')

@@ -52,12 +52,10 @@ class AesLayer(Connection):
             secret = self.rsa.decrypt(secret_encrypted)
             return lib_aes.Aes(secret)
 
-    def _encode(self, child_data=None):
-        data = child_data
+    def _encode(self, data):
         return {'data': self.aes.encrypt(data), 'aes_filename': self.aes_filename}
 
-    def _decode(self, parent_data=None):
-        aes_filename = parent_data['aes_filename']
+    def _decode(self, aes_filename, data):
         self.__get_aes_info(aes_filename)
-        print('decrypt', parent_data['data'])
-        return self.aes.decrypt(parent_data['data'])
+        print('decrypt', data)
+        return {'data': self.aes.decrypt(data)}

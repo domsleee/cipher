@@ -12,23 +12,23 @@ class Connection:
     def __init__(self):
         self.__child = None
 
-    def do_encode(self, child_data=None):
-        new_data = self._encode(child_data)
+    def do_encode(self, **kwargs):
+        new_data = self._encode(**kwargs)
         if self.__child:
-            return self.__child.do_encode(new_data)
+            return self.__child.do_encode(**new_data)
         else:
             return new_data
 
-    def _encode(self, child_data=None):
+    def _encode(self, **kwargs):
         pass
 
-    def do_decode(self, parent_data=None):
-        new_data = parent_data
+    def do_decode(self, **kwargs):
+        new_data = kwargs
         if self.__child:
-            new_data = self.__child.do_decode(parent_data)
-        return self._decode(new_data)
+            new_data = self.__child.do_decode(**new_data)
+        return self._decode(**new_data)
 
-    def _decode(self, parent_data=None):
+    def _decode(self, **kwargs):
         pass
 
     def attach(self, conn):

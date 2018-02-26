@@ -1,6 +1,4 @@
-"""Main entry module.
-
-Connection layer class.
+"""Connection layer class.
 
 Allows for attachable layers.
 

@@ -35,6 +35,13 @@ def cipher(request, mocker):
 
 @pytest.mark.usefixtures('fs')
 class TestCipher(object):
+    def test__copy_modified_time(self, cipher):
+        add_files({'file1': None, 'file2': None})
+        os.utime('file1', times=(0, 20))
+        os.utime('file2', times=(0, 40))
+        lib_cipher._copy_modified_time('file1', 'file2')
+        assert(os.path.getmtime('file2') == 20)
+    
     def test_basic_encrypt_file(self, cipher):
         data = b'1234'
         file_structure = {
@@ -129,14 +136,6 @@ class TestCipher(object):
             copy_modified_time.return_value = None
             cipher.encrypt_file('folder1')
             assert(copy_modified_time.call_count == 1)
-
-
-    def test__copy_modified_time(self, cipher):
-        add_files({'file1': None, 'file2': None})
-        os.utime('file1', times=(0, 20))
-        os.utime('file2', times=(0, 40))
-        lib_cipher._copy_modified_time('file1', 'file2')
-        assert(os.path.getmtime('file2') == 20)
 
 
     def test_hidden_file(self, cipher):

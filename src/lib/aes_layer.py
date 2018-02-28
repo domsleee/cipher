@@ -45,7 +45,7 @@ class AesLayer(Connection):
         secret = lib_aes.generate_secret()
         secret_encrypted = self.rsa.encrypt(secret)
         while True:
-            aes_filename = ''.join(random.choices(string.ascii_lowercase + string.digits, k=AES_FILENAME_LENGTH))
+            aes_filename = ''.join(random.choice(string.ascii_lowercase + string.digits) for i in range(AES_FILENAME_LENGTH))
             aes_path = os.path.join(self.aes_dir, aes_filename)
             if not os.path.isdir(aes_path):
                 with open(aes_path, 'wb') as file:

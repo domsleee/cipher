@@ -31,10 +31,10 @@ class Cipher:
         """
 
         for obj in parse_fs(path):
-            self.encrypt_reg_filenames(obj['root'], obj['regular_filenames'])
-            self.encrypt_hidden_filenames(obj['root'], obj['hidden_filenames'])
+            self.encrypt_regular_filenames(obj.root, obj.regular_filenames)
+            self.encrypt_hidden_filenames(obj.root, obj.hidden_filenames)
 
-    def encrypt_reg_filenames(self, path, regular_filenames):
+    def encrypt_regular_filenames(self, path, regular_filenames):
         for filename in regular_filenames:
             filepath = os.path.join(path, filename)
             path_enc = filepath+'.enc'

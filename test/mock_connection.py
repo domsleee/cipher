@@ -1,4 +1,4 @@
-from src.lib.connection import Connection
+from lib.connection import Connection
 
 class MockConnection(Connection):
     def __init__(self, *args, **kwargs):

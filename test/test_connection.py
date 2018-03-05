@@ -1,6 +1,6 @@
-from src.lib.connection import Connection
-from src.lib.connection import ENFORCE_ATTACH_MESSAGE
-from types import SimpleNamespace
+from lib.connection import Connection
+from lib.connection import ENFORCE_ATTACH_MESSAGE
+from argparse import Namespace
 import pytest
 
 CONN_ONE_ENCODE = {'data': 'a'}
@@ -12,7 +12,7 @@ CONN_THR_DECODE = {'data': 'f'}
 
 @pytest.fixture()
 def mock_conn(request, mocker):
-    obj = SimpleNamespace(**{'conn1': Connection(), 'conn2': Connection(), 'conn3': Connection()})
+    obj = Namespace(conn1=Connection(), conn2=Connection(), conn3=Connection())
     obj.conn1._encode = lambda **kwargs: CONN_ONE_ENCODE
     obj.conn1._decode = lambda **kwargs: CONN_ONE_DECODE
     obj.conn2._encode = lambda **kwargs: CONN_TWO_ENCODE

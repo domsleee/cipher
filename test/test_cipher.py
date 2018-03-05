@@ -1,11 +1,11 @@
 import os
-import src.lib.cipher as lib_cipher
-from src.lib.cipher import HIDDEN_FILE
+import lib.cipher as lib_cipher
+from lib.cipher import HIDDEN_FILE
 import mock
 import pytest
 import re
 from test.mock_connection import MockConnection
-from src.lib.fs_parser import ParsedRet
+from lib.fs_parser import ParsedRet
 
 AES_FOLDER = 'aes_folder'
 
@@ -43,7 +43,7 @@ class TestCipher(object):
         lib_cipher._copy_modified_time('file1', 'file2')
         assert(os.path.getmtime('file2') == 20)
 
-    @mock.patch('src.lib.cipher.parse_fs')
+    @mock.patch('lib.cipher.parse_fs')
     @mock.patch.object(lib_cipher.Cipher, 'encrypt_regular_filenames')
     @mock.patch.object(lib_cipher.Cipher, 'encrypt_hidden_filenames')
     def test_encrypt_files(self, en_hid, en_reg, parse_fs, cipher):
@@ -83,7 +83,7 @@ class TestCipher(object):
         assert(cipher.aes_layer.do_encode.call_args_list[1][1] == {'data': data2})
         assert(copy_modified_time.call_count == 2)
 
-    @mock.patch('src.lib.cipher.logger.info')
+    @mock.patch('lib.cipher.logger.info')
     @mock.patch.object(lib_cipher, '_copy_modified_time')
     def test_encrypt_regular_file_dont_override(self, copy_modified_time, logging_info, cipher):
         logging_info.return_value = None

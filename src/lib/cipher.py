@@ -8,10 +8,10 @@ Todo:
 
 """
 
-import src.lib.aes as lib_aes
-from src.lib.aes_layer import AesLayer
-from src.lib.header_layer import HeaderLayer
-from src.lib.fs_parser import parse_fs
+import lib.aes as lib_aes
+from lib.aes_layer import AesLayer
+from lib.header_layer import HeaderLayer
+from lib.fs_parser import parse_fs
 import logging
 import os
 import shutil

@@ -5,8 +5,8 @@ was used. Has no responsibility for file system or filename
 generation
 
 """
-from src.lib.connection import Connection
-from src.lib.aes_layer import AES_FILENAME_LENGTH
+from lib.connection import Connection
+from lib.aes_layer import AES_FILENAME_LENGTH
 import logging
 import re
 logger = logging.getLogger('header_layer')

@@ -18,8 +18,14 @@ class Aes:
         self._secret = secret
 
     def _get_aes(self):
-        ctr = Counter.new(128, initial_value=int(self._secret[0]) % 128)
+        initial = self._get_int(self._secret[0])
+        ctr = Counter.new(128, initial_value=initial % 128)
         return AES.new(self._secret, AES.MODE_CTR, counter=ctr)
+
+    def _get_int(self, s0):
+        """Get ascii value of byte. Python is bad.
+        """
+        return ord(s0) if isinstance(s0, str) else int(s0)
 
     def encrypt(self, data):
         """Encrypts data using AES with secret

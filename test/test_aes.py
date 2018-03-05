@@ -1,4 +1,4 @@
-import src.lib.aes as lib_aes
+import lib.aes as lib_aes
 
 TEXT_DEC = b'12345'
 TEXT_ENC = b'\x1c)\xc5M\xbd'

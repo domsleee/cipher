@@ -1,5 +1,5 @@
 import os
-import src.lib.rsa as lib_rsa
+import lib.rsa as lib_rsa
 import pytest
 
 

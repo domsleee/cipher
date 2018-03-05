@@ -1,4 +1,4 @@
-import src.lib.fs_parser as fs_parser
+import lib.fs_parser as fs_parser
 import os
 import pytest
 

@@ -5,3 +5,4 @@ pyfakefs==3.3
 coveralls
 coverage
 pytest-mock
+pytest-pythonpath

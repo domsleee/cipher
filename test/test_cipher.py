@@ -66,7 +66,7 @@ class TestCipher(object):
         assert(en_hid.call_args_list[1][0] == (ROOT2, HID2))
 
     @mock.patch.object(lib_cipher, '_copy_modified_time')
-    def test_encrypt_regular_file(self, copy_modified_time, cipher):
+    def test_encrypt_regular_folder(self, copy_modified_time, cipher):
         data = b'1234'
         data2 = b'4567'
         file_structure = {
@@ -99,3 +99,17 @@ class TestCipher(object):
         cipher.encrypt_regular_filenames('folder1', ['file1'])
         assert(len(os.listdir('folder1')) == 2)
         assert('refusing' in logging_info.call_args[0][0])
+
+    def test_encrypted_hidden_file(self, cipher):
+        data = b'1234'
+        folder_name = '.hidden'
+        file_structure = {
+            folder_name: {
+                'file1-h': data,
+            }
+        }
+        add_files(file_structure)
+        cipher.encrypt_hidden_filenames(folder_name, ['file1-h'])
+        print(os.listdir(folder_name))
+        assert(len(os.listdir(folder_name)) == 1)
+        assert(os.listdir(folder_name) == ['.hidden'])

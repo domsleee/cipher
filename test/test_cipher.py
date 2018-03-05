@@ -107,7 +107,6 @@ class TestCipher(object):
 
     @mock.patch.object(lib_cipher.Cipher, 'cipher_and_move')
     def test_encrypt_regular_files(self, cipher_and_move, cipher):
-        data = b'1234'
         filepath = os.path.join('folder1', 'file1')
         file_enc = filepath + '.enc'
         cipher.encrypt_regular_filenames('folder1', ['file1'])
@@ -149,3 +148,12 @@ class TestCipher(object):
         assert(en_hid.call_count == 2)
         assert(en_hid.call_args_list[0][0] == (ROOT1, ENHID1))
         assert(en_hid.call_args_list[1][0] == (ROOT2, ENHID2))
+
+    @mock.patch.object(lib_cipher.Cipher, 'cipher_and_move')
+    def test_decrypt_encrypted_filenames(self, cipher_and_move, cipher):
+        filepath = os.path.join('folder1', 'file1')
+        file_enc = filepath + '.enc'
+        cipher.decrypt_encrypted_filenames('folder1', ['file1.enc'])
+        assert(cipher_and_move.call_count == 1)
+        assert(cipher_and_move.call_args_list[0][0] == (file_enc, filepath, cipher.aes_layer.do_decode))
+

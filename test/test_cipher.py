@@ -113,3 +113,26 @@ class TestCipher(object):
         print(os.listdir(folder_name))
         assert(len(os.listdir(folder_name)) == 1)
         assert(os.listdir(folder_name) == ['.hidden'])
+
+
+    @mock.patch('src.lib.cipher.parse_fs')
+    @mock.patch.object(lib_cipher.Cipher, 'decrypt_encrypted_filenames')
+    @mock.patch.object(lib_cipher.Cipher, 'decrypted_encrypted_hidden_filenames')
+    def test_decrypt_files(self, en_hid, en_files, parse_fs, cipher):
+        ROOT1 = 'a'
+        ROOT2 = 'b'
+        EN1 = 'c'
+        EN2 = 'd'
+        ENHID1 = 'e'
+        ENHID2 = 'f'
+        RET1 = ParsedRet(ROOT1, encrypted_filenames=EN1, encrypted_hidden_filenames=ENHID1)
+        RET2 = ParsedRet(ROOT2, encrypted_filenames=EN2, encrypted_hidden_filenames=ENHID2)
+        parse_fs.return_value = iter([RET1, RET2])
+        cipher.decrypt_file('arg')
+        assert(parse_fs.call_count == 1)
+        assert(en_files.call_count == 2)
+        assert(en_files.call_args_list[0][0] == (ROOT1, EN1))
+        assert(en_files.call_args_list[1][0] == (ROOT2, EN2))
+        assert(en_hid.call_count == 2)
+        assert(en_hid.call_args_list[0][0] == (ROOT1, ENHID1))
+        assert(en_hid.call_args_list[1][0] == (ROOT2, ENHID2))

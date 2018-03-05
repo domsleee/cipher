@@ -29,7 +29,6 @@ class Cipher:
     def encrypt_file(self, path):
         """Encrypts a file/folder
         """
-
         for obj in parse_fs(path):
             self.encrypt_regular_filenames(obj.root, obj.regular_filenames)
             self.encrypt_hidden_filenames(obj.root, obj.hidden_filenames)
@@ -63,9 +62,17 @@ class Cipher:
             os.rename(tmp_file, hidden_dir)
 
 
-    def decrypt_file(self, filename):
+    def decrypt_file(self, path):
         """Decrypts a file/folder.
         """
+        for obj in parse_fs(path):
+            self.decrypt_encrypted_filenames(obj.root, obj.encrypted_filenames)
+            self.decrypted_encrypted_hidden_filenames(obj.root, obj.encrypted_hidden_filenames)
+
+    def decrypt_encrypted_filenames(self, path, encrypted_filenames):
+        pass
+
+    def decrypted_encrypted_hidden_filenames(self, path, hidden_filenames):
         pass
 
 def _copy_modified_time(file, file_enc):

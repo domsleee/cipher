@@ -77,7 +77,7 @@ class TestCipher(object):
         }
         add_files(file_structure)
         cipher.encrypt_regular_filenames('folder1', ['file1', 'file2'])
-        assert(os.listdir('folder1') == ['file1.enc', 'file2.enc'])
+        assert(sorted(os.listdir('folder1')) == sorted(['file1.enc', 'file2.enc']))
         assert(cipher.aes_layer.do_encode.call_count == 2)
         assert(cipher.aes_layer.do_encode.call_args_list[0][1] == {'data': data})
         assert(cipher.aes_layer.do_encode.call_args_list[1][1] == {'data': data2})

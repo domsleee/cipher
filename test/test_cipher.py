@@ -115,7 +115,7 @@ class TestCipher(object):
         assert(os.listdir(folder_name) == ['.hidden'])
 
 
-    @mock.patch('src.lib.cipher.parse_fs')
+    @mock.patch('lib.cipher.parse_fs')
     @mock.patch.object(lib_cipher.Cipher, 'decrypt_encrypted_filenames')
     @mock.patch.object(lib_cipher.Cipher, 'decrypted_encrypted_hidden_filenames')
     def test_decrypt_files(self, en_hid, en_files, parse_fs, cipher):

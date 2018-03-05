@@ -37,16 +37,19 @@ class Cipher:
         for filename in regular_filenames:
             filepath = os.path.join(path, filename)
             path_enc = filepath+'.enc'
-            if os.path.isfile(path_enc):
-                logger.info('%s already exists, refusing' % path_enc)
-                return
-            
-            with open(path_enc, 'wb') as fout:
-                with open(filepath, 'rb') as fin:
-                    out_data = self.aes_layer.do_encode(data=fin.read())
-                    fout.write(out_data['data'])
-            _copy_modified_time(filepath, path_enc)
-            os.remove(filepath)
+            self.cipher_and_move(filepath, path_enc, self.aes_layer.do_encode)
+
+    def cipher_and_move(self, filepath, path_enc, fn):
+        if os.path.isfile(path_enc):
+            logger.info('%s already exists, refusing' % path_enc)
+            return
+        
+        with open(path_enc, 'wb') as fout:
+            with open(filepath, 'rb') as fin:
+                out_data = fn(data=fin.read())
+                fout.write(out_data['data'])
+        _copy_modified_time(filepath, path_enc)
+        os.remove(filepath)
 
     def encrypt_hidden_filenames(self, path, hidden_filenames):
         if len(hidden_filenames):
@@ -70,7 +73,10 @@ class Cipher:
             self.decrypted_encrypted_hidden_filenames(obj.root, obj.encrypted_hidden_filenames)
 
     def decrypt_encrypted_filenames(self, path, encrypted_filenames):
-        pass
+        for filename in encrypted_filenames:
+            filepath = os.path.join(path, filename)
+            path_dec = filepath[:-4]
+            self.cipher_and_move(filepath, path_dec, self.aes_layer.do_decode)
 
     def decrypted_encrypted_hidden_filenames(self, path, hidden_filenames):
         pass

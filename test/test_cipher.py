@@ -43,6 +43,46 @@ class TestCipher(object):
         lib_cipher._copy_modified_time('file1', 'file2')
         assert(os.path.getmtime('file2') == 20)
 
+    @mock.patch.object(lib_cipher, '_copy_modified_time')
+    def test_cipher_and_move(self, copy_modified_time, cipher):
+        data = b'1234'
+        data2 = b'4567'
+        file_structure = {
+            'folder1': {
+                'file1': data,
+                'file2': data2
+            }
+        }
+        add_files(file_structure)
+        def f(filename):
+            return os.path.join('folder1', filename)
+        cipher.cipher_and_move(f('file1'), f('file1.enc'), cipher.aes_layer.do_encode)
+        cipher.cipher_and_move(f('file2'), f('file2.enc'), cipher.aes_layer.do_encode)
+        assert(sorted(os.listdir('folder1')) == sorted(['file1.enc', 'file2.enc']))
+        assert(cipher.aes_layer.do_encode.call_count == 2)
+        assert(cipher.aes_layer.do_encode.call_args_list[0][1] == {'data': data})
+        assert(cipher.aes_layer.do_encode.call_args_list[1][1] == {'data': data2})
+        assert(copy_modified_time.call_count == 2)
+
+    @mock.patch('lib.cipher.logger.info')
+    @mock.patch.object(lib_cipher, '_copy_modified_time')
+    def test_cipher_and_move_dont_override(self, copy_modified_time, logging_info, cipher):
+        logging_info.return_value = None
+        data = b'1234'
+        data2 = b'4567'
+        file_structure = {
+            'folder1': {
+                'file1': data,
+                'file1.enc': data2
+            }
+        }
+        add_files(file_structure)
+        filepath = os.path.join('folder1', 'file1')
+        file_enc = os.path.join('folder1', 'file1.enc')
+        cipher.cipher_and_move(filepath, file_enc, cipher.aes_layer.do_encode)
+        assert(len(os.listdir('folder1')) == 2)
+        assert('refusing' in logging_info.call_args[0][0])
+
     @mock.patch('lib.cipher.parse_fs')
     @mock.patch.object(lib_cipher.Cipher, 'encrypt_regular_filenames')
     @mock.patch.object(lib_cipher.Cipher, 'encrypt_hidden_filenames')
@@ -65,40 +105,14 @@ class TestCipher(object):
         assert(en_hid.call_args_list[0][0] == (ROOT1, HID1))
         assert(en_hid.call_args_list[1][0] == (ROOT2, HID2))
 
-    @mock.patch.object(lib_cipher, '_copy_modified_time')
-    def test_encrypt_regular_folder(self, copy_modified_time, cipher):
+    @mock.patch.object(lib_cipher.Cipher, 'cipher_and_move')
+    def test_encrypt_regular_files(self, cipher_and_move, cipher):
         data = b'1234'
-        data2 = b'4567'
-        file_structure = {
-            'folder1': {
-                'file1': data,
-                'file2': data2
-            }
-        }
-        add_files(file_structure)
-        cipher.encrypt_regular_filenames('folder1', ['file1', 'file2'])
-        assert(sorted(os.listdir('folder1')) == sorted(['file1.enc', 'file2.enc']))
-        assert(cipher.aes_layer.do_encode.call_count == 2)
-        assert(cipher.aes_layer.do_encode.call_args_list[0][1] == {'data': data})
-        assert(cipher.aes_layer.do_encode.call_args_list[1][1] == {'data': data2})
-        assert(copy_modified_time.call_count == 2)
-
-    @mock.patch('lib.cipher.logger.info')
-    @mock.patch.object(lib_cipher, '_copy_modified_time')
-    def test_encrypt_regular_file_dont_override(self, copy_modified_time, logging_info, cipher):
-        logging_info.return_value = None
-        data = b'1234'
-        data2 = b'4567'
-        file_structure = {
-            'folder1': {
-                'file1': data,
-                'file1.enc': data2
-            }
-        }
-        add_files(file_structure)
+        filepath = os.path.join('folder1', 'file1')
+        file_enc = filepath + '.enc'
         cipher.encrypt_regular_filenames('folder1', ['file1'])
-        assert(len(os.listdir('folder1')) == 2)
-        assert('refusing' in logging_info.call_args[0][0])
+        assert(cipher_and_move.call_count == 1)
+        assert(cipher_and_move.call_args_list[0][0] == (filepath, file_enc, cipher.aes_layer.do_encode))
 
     def test_encrypted_hidden_file(self, cipher):
         data = b'1234'
@@ -113,7 +127,6 @@ class TestCipher(object):
         print(os.listdir(folder_name))
         assert(len(os.listdir(folder_name)) == 1)
         assert(os.listdir(folder_name) == ['.hidden'])
-
 
     @mock.patch('lib.cipher.parse_fs')
     @mock.patch.object(lib_cipher.Cipher, 'decrypt_encrypted_filenames')

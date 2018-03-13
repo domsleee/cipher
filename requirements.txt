@@ -6,3 +6,4 @@ coveralls
 coverage
 pytest-mock
 pytest-pythonpath
+configobj

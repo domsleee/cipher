@@ -11,7 +11,7 @@ class Config:
             setattr(self, field, None)
 
     def get_config(self, config_file=CONFIG_FILE):
-        with open('tmp', 'r') as file:
+        with open(config_file, 'r') as file:
             print(file.read())
         config = configobj.ConfigObj(config_file)
         for field in self._fields:

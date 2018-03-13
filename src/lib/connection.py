@@ -3,7 +3,6 @@
 Allows for attachable layers.
 
 """
-
 ENFORCE_ATTACH_MESSAGE = 'Attached object must be of type Connection'
 
 class Connection:

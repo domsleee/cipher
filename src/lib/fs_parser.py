@@ -1,3 +1,9 @@
+"""Groups files/folders from filesystem.
+
+parse_fs is a generator that interprets the file system
+and returns groups of files by folder
+
+"""
 import re
 import os
 import ntpath
@@ -30,8 +36,6 @@ def parse_fs(path):
             elif RE_HIDDEN_FILE.search(file):
                 ret.hidden_filenames.append(file)
                 if os.path.isdir(filepath):
-                    print('ISPATH %s' % file)
-                    print(dirs)
                     dirs.remove(file)
             elif RE_ENCRYPTED_HIDDEN_FILE.search(file):
                 ret.encrypted_hidden_filenames.append(file)

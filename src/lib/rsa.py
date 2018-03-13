@@ -2,11 +2,7 @@
 
 Allows for generating RSA keypairs and encrypting/decrypting.
 
-Attributes:
-    _logger (Logger): Module-level logging
-
 """
-
 from Cryptodome.IO import PKCS8
 from Cryptodome.Cipher import PKCS1_OAEP
 from Cryptodome.PublicKey import RSA

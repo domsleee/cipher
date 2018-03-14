@@ -2,6 +2,7 @@ from lib.aes_layer import AesLayer
 import lib.aes_layer
 from test import mock_rsa
 from test import mock_aes
+from test.mock_config import Config
 import pytest
 import os
 import re
@@ -9,6 +10,8 @@ import mock
 
 AES_FOLDER = 'aes_folder'
 AES_DIR = AES_FOLDER
+CONFIG = Config()
+CONFIG.aes_dir = AES_DIR
 AES_FILENAME = 'a'*10
 AES_FILE = os.path.join(AES_FOLDER, AES_FILENAME)
 RSA_FOLDER = '.enc'
@@ -22,6 +25,7 @@ PASSPHRASE = b'abcd'
 
 lib.aes_layer.lib_rsa = mock_rsa
 lib.aes_layer.lib_aes = mock_aes
+lib.aes_layer.Config = Config
 
 # TODO
 # - Consider property testing for time preserved
@@ -57,7 +61,7 @@ def add_files(structure, path='.'):
 class TestAesLayer:
     def setup(self):
         self.aes_filename = AES_FILENAME
-        self.aes_layer = AesLayer(AES_DIR)
+        self.aes_layer = AesLayer(CONFIG)
         self.mock_aes = mock_aes.Aes(None)
 
     def test_constructor_uses_aes(self):
@@ -68,7 +72,9 @@ class TestAesLayer:
             'folder1': {}
         }
         add_files(file_structure)
-        AesLayer('folder1')
+        cfg = Config()
+        cfg.aes_dir = 'folder1'
+        AesLayer(cfg)
         assert(len(os.listdir('folder1')) == 1)
 
     def test_constructor_creates_aes_if_cant_decrypt(self):
@@ -78,7 +84,9 @@ class TestAesLayer:
         add_files(file_structure)
         with mock.patch('lib.aes_layer.lib_rsa.Rsa.can_decrypt') as can_decrypt:
             can_decrypt.return_value = False
-            AesLayer('folder1')
+            cfg = Config()
+            cfg.aes_dir = 'folder1'
+            AesLayer(cfg)
             assert(len(os.listdir('folder1')) == 2)
 
     def test_encode(self):
@@ -95,9 +103,12 @@ class TestAesLayer:
 
     def test_rsa_priv_is_read(self, mocker):
         mocker.spy(lib.aes_layer.lib_rsa.Rsa, '__init__')
-        AesLayer(AES_FOLDER)
-        AesLayer(AES_FOLDER, rsa_priv=RSA_PRIV_FILE)
-        AesLayer(AES_FOLDER, rsa_priv=RSA_PRIV_FILE, passphrase=PASSPHRASE)
+        cfg = Config()
+        cfg.aes_dir = AES_DIR
+        AesLayer(cfg)
+        cfg.private_key = RSA_PRIV_FILE
+        AesLayer(cfg)
+        AesLayer(cfg, PASSPHRASE)
         rsa = lib.aes_layer.lib_rsa.Rsa.__init__
         assert(rsa.call_args_list[0][1] == {'passphrase':None, 'private_key':None, 'public_key':None})
         assert(rsa.call_args_list[1][1] == {'passphrase':None, 'private_key':RSA_PRIV, 'public_key':None})
@@ -105,8 +116,11 @@ class TestAesLayer:
 
     def test_rsa_pub_is_read(self, mocker):
         mocker.spy(lib.aes_layer.lib_rsa.Rsa, '__init__')
-        AesLayer(AES_FOLDER)
-        AesLayer(AES_FOLDER, rsa_pub=RSA_PUB_FILE)
+        cfg = Config()
+        cfg.aes_dir = AES_DIR
+        AesLayer(cfg)
+        cfg.public_key = RSA_PUB_FILE
+        AesLayer(cfg)
         rsa = lib.aes_layer.lib_rsa.Rsa.__init__
         assert(rsa.call_args_list[0][1] == {'passphrase':None, 'private_key':None, 'public_key':None})
         assert(rsa.call_args_list[1][1] == {'passphrase':None, 'private_key':None, 'public_key':RSA_PUB})

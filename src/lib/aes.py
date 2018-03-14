@@ -17,6 +17,12 @@ class Aes:
         """
         self._secret = secret
 
+    def encrypt(self, data):
+        """Encrypts data using AES with secret
+        """
+        aes = self._get_aes()
+        return aes.encrypt(data)
+
     def _get_aes(self):
         initial = self._get_int(self._secret[0])
         ctr = Counter.new(128, initial_value=initial % 128)
@@ -26,13 +32,6 @@ class Aes:
         """Get ascii value of byte. Python is bad.
         """
         return ord(s0) if isinstance(s0, str) else int(s0)
-
-    def encrypt(self, data):
-        """Encrypts data using AES with secret
-        """
-        aes = self._get_aes()
-        ciphertext = aes.encrypt(data)
-        return ciphertext
 
     def decrypt(self, data):
         """Decrypts data using AES with secret

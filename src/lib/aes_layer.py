@@ -7,26 +7,31 @@ and the RSA encrypted aes secrets in the filesystem
 from lib.connection import Connection
 import lib.rsa as lib_rsa
 import lib.aes as lib_aes
+from lib.config import Config
 import random
 import string
 import os
 import logging
 import re
+
 logger = logging.getLogger('aes_layer')
 AES_FILENAME_LENGTH = 10
 
 class AesLayer(Connection):
-    def __init__(self, aes_dir, rsa_pub=None, rsa_priv=None, passphrase=None):
+    def __init__(self, config, passphrase=None):
         Connection.__init__(self)
+        if not isinstance(config, Config):
+            raise ValueError('Config must be an instance of Config()')
         public_key = private_key = None
-        if rsa_pub:
-            with open(rsa_pub, 'rb') as file:
+        if config.public_key:
+            with open(config.public_key, 'rb') as file:
                 public_key = file.read()
-        if rsa_priv:
-            with open(rsa_priv, 'rb') as file:
+        if config.private_key:
+            with open(config.private_key, 'rb') as file:
                 private_key = file.read()
-        self.aes_dir = aes_dir
-        self.rsa = lib_rsa.Rsa(private_key=private_key, public_key=public_key, passphrase=passphrase)
+        self.aes_dir = config.aes_dir
+        self.rsa = lib_rsa.Rsa(private_key=private_key, public_key=public_key,
+                               passphrase=passphrase)
         self.aes, self.aes_filename = self.__get_aes_info()
 
     def __get_aes_info(self, aes_filename=None):

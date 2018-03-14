@@ -5,9 +5,12 @@ import mock
 import pytest
 import re
 from test.mock_connection import MockConnection
+from test.mock_config import Config
 from lib.fs_parser import ParsedRet
 
 AES_FOLDER = 'aes_folder'
+CONFIG = Config()
+CONFIG.aes_folder = AES_FOLDER
 
 def add_files(structure, path='.'):
     for key in structure:
@@ -25,7 +28,7 @@ def add_files(structure, path='.'):
 def cipher(request, mocker):
     lib_cipher.AesLayer = mock.MagicMock(return_value=MockConnection())
     lib_cipher.HeaderLayer = mock.MagicMock(return_value=MockConnection())
-    cipher = lib_cipher.Cipher(AES_FOLDER)
+    cipher = lib_cipher.Cipher(CONFIG)
     conns = ['aes_layer', 'header_layer']
     methods = ['do_encode', 'do_decode', 'attach']
     for conn in conns:

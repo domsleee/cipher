@@ -4,11 +4,10 @@ Handles encryption/decryption with RSA/AES hybrid. Also
 manages hidden folders.
 
 Todo:
-    * decrypt implementation
+    * decrypt hidden implementation
 
 """
 
-import lib.aes as lib_aes
 from lib.aes_layer import AesLayer
 from lib.header_layer import HeaderLayer
 from lib.fs_parser import parse_fs
@@ -19,8 +18,8 @@ logger = logging.getLogger('cipher')
 HIDDEN_FILE = '.hidden'
 
 class Cipher:
-    def __init__(self, aes_dir, rsa_pub=None, rsa_priv=None, passphrase=None):
-        self.aes_layer = AesLayer(aes_dir, rsa_pub=rsa_pub, rsa_priv=rsa_priv, passphrase=passphrase)
+    def __init__(self, config, passphrase=None):
+        self.aes_layer = AesLayer(config, passphrase)
         self.header_layer = HeaderLayer()
         self.aes_layer.attach(self.header_layer)
         #self.hidden_layer = HiddenLayer()

@@ -132,7 +132,7 @@ class TestCipher(object):
 
     @mock.patch('lib.cipher.parse_fs')
     @mock.patch.object(lib_cipher.Cipher, 'decrypt_encrypted_filenames')
-    @mock.patch.object(lib_cipher.Cipher, 'decrypted_encrypted_hidden_filenames')
+    @mock.patch.object(lib_cipher.Cipher, 'decrypt_encrypted_hidden_filenames')
     def test_decrypt_files(self, en_hid, en_files, parse_fs, cipher):
         ROOT1 = 'a'
         ROOT2 = 'b'
@@ -159,4 +159,8 @@ class TestCipher(object):
         cipher.decrypt_encrypted_filenames('folder1', ['file1.enc'])
         assert(cipher_and_move.call_count == 1)
         assert(cipher_and_move.call_args_list[0][0] == (file_enc, filepath, cipher.aes_layer.do_decode))
+
+    def test_decrypt_encrypted_hidden_filenames(self, cipher):
+        with pytest.raises(NotImplementedError):
+            cipher.decrypt_encrypted_hidden_filenames(None, None)
 

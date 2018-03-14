@@ -89,6 +89,10 @@ class TestAesLayer:
             AesLayer(cfg)
             assert(len(os.listdir('folder1')) == 2)
 
+    def test_constructor_invalid_config(self):
+        with pytest.raises(ValueError):
+            AesLayer(None)
+
     def test_encode(self):
         data = b'1234'
         res = self.aes_layer.do_encode(data=data)

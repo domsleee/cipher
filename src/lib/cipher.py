@@ -69,7 +69,7 @@ class Cipher:
         """
         for obj in parse_fs(path):
             self.decrypt_encrypted_filenames(obj.root, obj.encrypted_filenames)
-            self.decrypted_encrypted_hidden_filenames(obj.root, obj.encrypted_hidden_filenames)
+            self.decrypt_encrypted_hidden_filenames(obj.root, obj.encrypted_hidden_filenames)
 
     def decrypt_encrypted_filenames(self, path, encrypted_filenames):
         for filename in encrypted_filenames:
@@ -77,8 +77,8 @@ class Cipher:
             path_dec = filepath[:-4]
             self.cipher_and_move(filepath, path_dec, self.aes_layer.do_decode)
 
-    def decrypted_encrypted_hidden_filenames(self, path, hidden_filenames):
-        pass
+    def decrypt_encrypted_hidden_filenames(self, path, hidden_filenames):
+        raise NotImplementedError
 
 def _copy_modified_time(file, file_enc):
     modified_time = os.path.getmtime(file)
